@@ -1,0 +1,55 @@
+RF Circuit Design Lab - Licence for educational use
+====================================================
+
+Copyright (C) 2026 Dr Hichem Boubakar. All rights reserved.
+
+RF Circuit Design Lab ("the Software") includes the program, its theory chapters, experiments,
+figures, typeset equations, photographs and documentation. By installing or using the Software you
+agree to these terms. If you do not agree, do not install or use it.
+
+1. What you may do
+   You may install and use the Software, free of charge, for learning and teaching:
+   in courses, laboratory sessions, homework and self-study. You may save, share and submit the
+   project files (.rflab) and exported results that you create with it.
+
+2. What you may not do
+   Without the author's written permission you may not:
+   a) copy or redistribute the Software or its installer, including by uploading it to another
+      website, file-sharing service or app store. The only official source is the download page,
+      https://hichemriky-maker.github.io/rf-circuit-design-lab/ , and its GitHub releases at
+      https://github.com/hichemriky-maker/rf-circuit-design-lab/releases . Anyone may download it
+      from there; you may share links to that page;
+   b) sell, rent, lend or sublicense the Software, or use it to provide a paid service;
+   c) modify, translate, adapt or create derivative works of the Software or its content;
+   d) reverse-engineer, decompile, unpack or disassemble the Software, except to the extent that
+      applicable law expressly permits it despite this restriction;
+   e) remove or change the author's name, copyright notices or this licence.
+
+3. Third-party components
+   The Software includes open-source components, such as Qt for Python (LGPL-3.0), NumPy, SciPy and
+   scikit-rf. They remain under their own licences, listed in THIRD-PARTY-NOTICES.txt and the
+   "licenses" folder installed with the Software. Nothing in this licence limits your rights under
+   those licences; in particular, you may replace the Qt libraries as the LGPL allows.
+
+4. Beta software, educational models, no warranty
+   The Software is a beta version and may contain errors. It uses simplified analytical and
+   numerical models for teaching. Its results can differ from real hardware and must not be relied on for safety-critical, commercial or
+   production design. The Software is provided "as is", without warranty of any kind, express or
+   implied, including fitness for a particular purpose.
+
+5. Limitation of liability
+   To the extent permitted by law, the author is not liable for any damage or loss arising from
+   the use of, or inability to use, the Software.
+
+6. Privacy
+   The Software works offline. It does not collect, send or share any personal data. Your session
+   and projects are stored only on your own computer.
+
+7. Ownership
+   The Software is licensed, not sold. The author keeps all rights not expressly granted here.
+   This licence ends automatically if you break its terms; you must then delete all copies.
+
+8. Permissions and feedback
+   For permission beyond these terms, or to report a problem, open an issue at
+   https://github.com/hichemriky-maker/rf-circuit-design-lab/issues or contact the author through
+   your course instructor.

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RF Circuit Design Lab: interactive RF and microwave labs for Windows</title>
+<meta name="description" content="RF Circuit Design Lab by Dr Hichem Boubakar: free, offline Windows labs for transmission lines, matching, filters, microstrip, the Smith chart, amplifiers, couplers and oscillators, with theory chapters and guided experiments.">
+<meta property="og:title" content="RF Circuit Design Lab">
+<meta property="og:description" content="Interactive RF and microwave circuit design labs for Windows, with theory and guided experiments. Free beta.">
+<meta property="og:image" content="https://hichemriky-maker.github.io/rf-circuit-design-lab/images/library.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" href="images/favicon.ico">
+<style>
+:root {
+  --bg: #fafaff; --surface: #ffffff; --soft: #f1eefb; --line: #e1daf5;
+  --ink: #1c1552; --text: #2b2950; --muted: #5c567c; --accent: #3d1fc2; --accent-ink: #ffffff;
+  --mint: #0a8f79; --warn-bg: #fff7ef; --warn-line: #f1dcc8;
+  --shadow: 0 10px 30px rgba(40, 20, 110, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12101f; --surface: #1b1830; --soft: #221e3b; --line: #332d55;
+    --ink: #ece9ff; --text: #d9d5f2; --muted: #a49fc4; --accent: #8f7bff; --accent-ink: #12101f;
+    --mint: #43d3b8; --warn-bg: #2a2117; --warn-line: #4d3a26; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+a { color: var(--accent); }
+img { max-width: 100%; height: auto; display: block; }
+.hero > *, .labs > *, .author > *, .features > * { min-width: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+header.top img { width: 32px; height: 32px; border-radius: 8px; }
+header.top .name { font-weight: 700; color: var(--ink); }
+header.top nav { margin-left: auto; display: flex; gap: 18px; font-size: 15px; }
+header.top nav a { color: var(--muted); text-decoration: none; }
+header.top nav a:hover { color: var(--accent); }
+.hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 44px; align-items: center; }
+.badge { display: inline-block; font-size: 13px; font-weight: 650; color: var(--accent); background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; }
+h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.08; color: var(--ink); margin: 14px 0 14px; letter-spacing: -.02em; }
+.lead { font-size: 19px; color: var(--muted); margin: 0 0 26px; }
+.by { color: var(--muted); margin-top: 18px; font-size: 15px; }
+.by strong { color: var(--ink); }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.button { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 10px; font-weight: 650; text-decoration: none; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+.button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow); }
+.button.primary:hover { filter: brightness(1.08); }
+.button svg { width: 20px; height: 20px; }
+.meta { font-size: 14px; color: var(--muted); margin-top: 12px; }
+.shot { border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--surface); }
+section { padding: 52px 0; }
+section + section { border-top: 1px solid var(--line); }
+h2 { font-size: 30px; color: var(--ink); margin: 0 0 8px; letter-spacing: -.01em; }
+.sub { color: var(--muted); margin: 0 0 30px; max-width: 760px; }
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.card h3 { margin: 0 0 6px; font-size: 17px; color: var(--ink); }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+.labs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
+.lab figure { margin: 0; }
+.lab img { border-radius: 10px; border: 1px solid var(--line); }
+.lab h3 { margin: 14px 0 4px; color: var(--ink); font-size: 19px; }
+.lab p { margin: 0; color: var(--muted); font-size: 15px; }
+.list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 30px; padding: 0; margin: 0; list-style: none; }
+.list li { padding-left: 26px; position: relative; }
+.list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 9px; height: 9px; border-radius: 50%; background: var(--mint); }
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.steps li { counter-increment: step; position: relative; padding: 14px 18px 14px 58px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.steps li::before { content: counter(step); position: absolute; left: 16px; top: 13px; width: 28px; height: 28px; border-radius: 50%; background: var(--soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; }
+.note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 10px; padding: 14px 18px; margin-top: 18px; }
+code, .hash { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+.hash { display: block; padding: 10px 12px; overflow-wrap: anywhere; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { width: 34%; color: var(--ink); font-weight: 650; background: var(--soft); }
+tr:last-child th, tr:last-child td { border-bottom: none; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+details + details { margin-top: 10px; }
+summary { cursor: pointer; font-weight: 650; color: var(--ink); }
+details p { margin: 10px 0 0; color: var(--muted); }
+.author { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+footer { padding: 34px 0 46px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
+@media (max-width: 860px) {
+  .hero, .labs, .author { grid-template-columns: 1fr; }
+  .features { grid-template-columns: 1fr 1fr; }
+  .list { grid-template-columns: 1fr; }
+  header.top nav { display: none; }
+  .hero { padding-top: 36px; }
+}
+@media (max-width: 560px) { .features { grid-template-columns: 1fr; } th { width: 42%; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <img src="images/icon.png" alt="">
+    <span class="name">RF Circuit Design Lab</span>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#labs">Labs</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases">All versions</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <span class="badge">Free beta · v0.18 · Windows</span>
+      <h1>Learn RF circuit design by doing it.</h1>
+      <p class="lead">Interactive labs for transmission lines, impedance matching, filters, microstrip, the Smith chart, amplifiers, couplers and oscillators, with textbook theory and guided experiments that check your answers.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>
+          Download for Windows
+        </a>
+        <a class="button" href="#install">How to install</a>
+      </div>
+      <p class="meta">Version 0.18 beta · 76 MB installer · Windows 10 and 11, 64-bit · Works offline</p>
+      <p class="by">Created by <strong>Dr Hichem Boubakar</strong></p>
+    </div>
+    <img class="shot" src="images/library.jpg" alt="The Lab Library: nine labs and the Circuit Studio, each with its experiments and progress" width="1600" height="873">
+  </div>
+
+  <section id="features">
+    <h2>A complete RF lab bench on your laptop</h2>
+    <p class="sub">Every lab pairs a live circuit with its theory. Change a value and every plot, readout and drawing updates at once, so you see cause and effect instead of reading about it.</p>
+    <div class="features">
+      <div class="card"><h3>Nine labs and a Studio</h3><p>From transmission lines to oscillators, plus a Circuit Studio where you build any circuit from parts and analyse it.</p></div>
+      <div class="card"><h3>50 guided experiments</h3><p>Step-by-step measurements that check your readings, give hints, and show the worked solution after a first attempt.</p></div>
+      <div class="card"><h3>Textbook theory</h3><p>A chapter for every lab, with properly typeset equations, drawn figures, worked examples and check-yourself questions.</p></div>
+      <div class="card"><h3>A real Smith chart</h3><p>Draw on classic paper with compass and ruler, build matching networks move by move, and see the exact solutions.</p></div>
+      <div class="card"><h3>Real physics</h3><p>Transmission-line and S-parameter models, a hybrid-π transistor, and a time-domain oscillator simulation that grows from noise.</p></div>
+      <div class="card"><h3>Save and compare</h3><p>Pin a baseline to compare designs, save your work as a project file, and pick up where you left off.</p></div>
+    </div>
+  </section>
+
+  <section id="labs">
+    <h2>The labs</h2>
+    <p class="sub">Each lab has a free bench to explore and guided experiments with checked steps.</p>
+    <div class="labs">
+      <div class="lab"><img src="images/transmission-lines.jpg" alt="Transmission Line lab with the standing wave along the line" loading="lazy" width="1600" height="873"><h3>Transmission Lines</h3><p>Forward and reflected waves, the standing-wave pattern, and a slotted-line measurement of an unknown load.</p></div>
+      <div class="lab"><img src="images/smith-chart.jpg" alt="Smith Chart workspace with a load plotted on the impedance grid" loading="lazy" width="1600" height="873"><h3>Smith Chart</h3><p>Read and draw on the chart as on paper, then build L-network, stub and quarter-wave matches move by move.</p></div>
+      <div class="lab"><img src="images/filters.jpg" alt="LC Filter Design lab with a Butterworth ladder and its response" loading="lazy" width="1600" height="873"><h3>Matching, Filters and Microstrip</h3><p>Size a quarter-wave transformer, meet a filter specification with Butterworth and Chebyshev ladders, and tune a microstrip notch.</p></div>
+      <div class="lab"><img src="images/amplifiers.jpg" alt="BJT amplifier lab with a guided gain experiment and frequency response" loading="lazy" width="1600" height="873"><h3>Amplifiers</h3><p>Bias a common-emitter stage, estimate its gain and bandwidth by hand, watch it clip on the oscilloscope, then design for an RF goal.</p></div>
+      <div class="lab"><img src="images/oscillators.jpg" alt="LC Oscillators lab with a Colpitts circuit growing from noise" loading="lazy" width="1600" height="873"><h3>Oscillators</h3><p>Watch a Colpitts or Clapp oscillator start from a tiny kick, predict its frequency and amplitude, and find the start-up limit.</p></div>
+      <div class="lab"><img src="images/couplers.jpg" alt="Couplers and Dividers lab with a branch-line hybrid" loading="lazy" width="1600" height="873"><h3>Couplers and Dividers</h3><p>Split power with branch-line and rat-race hybrids, a Wilkinson divider and coupled lines, and find where reflections go.</p></div>
+      <div class="lab"><img src="images/studio.jpg" alt="Circuit Studio with a low-pass filter drawn from parts" loading="lazy" width="1600" height="873"><h3>Circuit Studio</h3><p>Build any circuit from lumped and distributed parts and transistors; get S-parameters, stability and gain readouts.</p></div>
+      <div class="lab"><img src="images/theory.jpg" alt="Theory chapter with the hybrid-π model and typeset equations" loading="lazy" width="1600" height="873"><h3>Theory chapters</h3><p>Goals, explanations, figures, numbered equations, worked examples from the app's own models, and further reading.</p></div>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p class="sub">The installer needs no administrator rights and installs for your user account only.</p>
+    <ol class="steps">
+      <li><a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe">Download <code>RF-Circuit-Design-Lab-Setup-v0.18.exe</code></a> (76 MB).</li>
+      <li>Open the downloaded file. If Windows shows <strong>“Windows protected your PC”</strong>, click <strong>More info</strong>, then <strong>Run anyway</strong>.</li>
+      <li>Read and accept the licence, choose whether you want a desktop icon and whether <code>.rflab</code> project files should open in the app, then click <strong>Install</strong>.</li>
+      <li>Start <strong>RF Circuit Design Lab</strong> from the Start menu. Begin with the Transmission Line or Smith Chart lab.</li>
+    </ol>
+    <div class="note"><strong>Why the Windows warning?</strong> The installer is not yet signed with a paid code-signing certificate, so Windows does not recognise the publisher. Download it only from this page or the <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases">official releases</a>, and check the SHA-256 checksum if you want to be sure the file is genuine:
+      <span class="hash">dee6fd8532913292448ee88bdd3ab788e433e28b0bfc28c2d219917f711f717a</span>
+      In PowerShell: <code>Get-FileHash .\RF-Circuit-Design-Lab-Setup-v0.18.exe</code></div>
+    <p style="margin-top:18px">To uninstall, use <strong>Settings › Apps › Installed apps</strong>. Your saved projects are kept.</p>
+  </section>
+
+  <section id="requirements">
+    <h2>System requirements</h2>
+    <table>
+      <tr><th>Operating system</th><td>Windows 10 or Windows 11, 64-bit</td></tr>
+      <tr><th>Disk space</th><td>About 280 MB after installation</td></tr>
+      <tr><th>Screen</th><td>1280 × 720 or larger; 1920 × 1080 recommended</td></tr>
+      <tr><th>Internet</th><td>Only to download. The app runs completely offline.</td></tr>
+      <tr><th>Administrator rights</th><td>Not needed</td></tr>
+    </table>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <details><summary>Is it free?</summary><p>Yes. It is free for learning and teaching. Please share a link to this page rather than the installer file, so everyone gets the latest version.</p></details>
+    <details><summary>What does “beta” mean here?</summary><p>All labs work and the physics is tested against closed-form results, but the app is still growing. Features may change between versions, and your reports help make it better.</p></details>
+    <details><summary>Does it collect any data?</summary><p>No. The app works offline and sends nothing anywhere. Your session and projects are stored only on your own computer.</p></details>
+    <details><summary>Is it accurate enough for real designs?</summary><p>It uses simplified models made for teaching. Results show the right behaviour and trends but can differ from real hardware. Do not use it for production or safety-critical design.</p></details>
+    <details><summary>Does it run on macOS or Linux?</summary><p>Not yet. This version is for Windows only.</p></details>
+    <details><summary>How do I update?</summary><p>Download the newest installer from this page and run it. It replaces the old version and keeps your saved work.</p></details>
+    <details><summary>How do I report a problem or suggest a feature?</summary><p><a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/issues">Open an issue on GitHub</a> with what you did, what you expected and what happened, plus a screenshot if you can.</p></details>
+  </section>
+
+  <section id="about">
+    <div class="author">
+      <div>
+        <h2>About the author</h2>
+        <p>RF Circuit Design Lab is created by <strong>Dr Hichem Boubakar</strong> to make radio-frequency and microwave circuit design visible and hands-on: the kind of lab where every number on the screen can be checked against the theory, and every experiment teaches one idea well.</p>
+      </div>
+      <div>
+        <h2>Licence</h2>
+        <p>Copyright © 2026 Dr Hichem Boubakar. All rights reserved. Free for learning and teaching; redistribution, modification and sale need the author's written permission. Read the <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/blob/main/LICENSE.txt">full licence</a>. The app includes open-source components, such as Qt for Python under the LGPL-3.0; their notices are installed with the app.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Dr Hichem Boubakar · RF Circuit Design Lab</span>
+    <span><a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases">Releases</a> · <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/issues">Report a problem</a> · <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/blob/main/LICENSE.txt">Licence</a></span>
+  </div>
+</footer>
+</body>
+</html>
