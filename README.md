@@ -7,10 +7,10 @@ Free beta · v0.18 · Windows 10 and 11 (64-bit) · Works offline<br>
 Created by <b>Dr Hichem Boubakar</b></p>
 
 <p align="center">
-  <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe"><b>⬇ Download the installer (76 MB)</b></a> ·
-  <a href="https://hichemriky-maker.github.io/rf-circuit-design-lab/">Website</a> ·
-  <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/releases">All versions</a> ·
-  <a href="https://github.com/hichemriky-maker/rf-circuit-design-lab/issues">Report a problem</a>
+  <a href="https://github.com/hichemboubakar/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe"><b>⬇ Download the installer (76 MB)</b></a> ·
+  <a href="https://hichemboubakar.github.io/rf-circuit-design-lab/">Website</a> ·
+  <a href="https://github.com/hichemboubakar/rf-circuit-design-lab/releases">All versions</a> ·
+  <a href="https://github.com/hichemboubakar/rf-circuit-design-lab/issues">Report a problem</a>
 </p>
 
 ![The Lab Library](docs/images/library.jpg)
@@ -33,18 +33,18 @@ RF Circuit Design Lab is a lab bench on your laptop. Every lab pairs a live circ
 
 ## Install
 
-1. Download [`RF-Circuit-Design-Lab-Setup-v0.18.exe`](https://github.com/hichemriky-maker/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe).
+1. Download [`RF-Circuit-Design-Lab-Setup-v0.18.exe`](https://github.com/hichemboubakar/rf-circuit-design-lab/releases/download/v0.18/RF-Circuit-Design-Lab-Setup-v0.18.exe).
 2. Open it. If Windows shows **“Windows protected your PC”**, click **More info**, then **Run anyway**. The installer is not yet signed with a paid certificate, so Windows does not recognise the publisher.
 3. Accept the licence and click **Install**. No administrator rights are needed.
 4. Start **RF Circuit Design Lab** from the Start menu.
 
-To check the file is genuine, compare its SHA-256 checksum with the one in the [release notes](https://github.com/hichemriky-maker/rf-circuit-design-lab/releases/tag/v0.18): in PowerShell, run `Get-FileHash .\RF-Circuit-Design-Lab-Setup-v0.18.exe`.
+To check the file is genuine, compare its SHA-256 checksum with the one in the [release notes](https://github.com/hichemboubakar/rf-circuit-design-lab/releases/tag/v0.18): in PowerShell, run `Get-FileHash .\RF-Circuit-Design-Lab-Setup-v0.18.exe`.
 
 **Requirements:** Windows 10 or 11, 64-bit; about 280 MB of disk space; a 1280 × 720 or larger screen.
 
 ## Beta
 
-All labs work and the physics is tested against closed-form results, but the app is still growing. Please [report problems and ideas](https://github.com/hichemriky-maker/rf-circuit-design-lab/issues) with what you did, what you expected and what happened.
+All labs work and the physics is tested against closed-form results, but the app is still growing. Please [report problems and ideas](https://github.com/hichemboubakar/rf-circuit-design-lab/issues) with what you did, what you expected and what happened.
 
 ## Privacy
 
