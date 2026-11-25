@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smith Chart Lab</title>
+<meta name="description" content="A free online Smith chart that works like paper: plot a load, read z, y, Γ, VSWR and return loss, and see on the chart how every value is read. By Dr Hichem Boubakar, from RF Circuit Design Lab.">
+<meta name="theme-color" content="#efe9dc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15162b" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Smith Chart Lab">
+<meta property="og:description" content="A free online Smith chart that works like paper, and shows you how every value is read.">
+<link rel="icon" href="../images/favicon.ico">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Smith Lab">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="css/app.css">
+<script>
+  // Apply the saved theme before first paint so the page never flashes.
+  try { const t = localStorage.getItem('smith.theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../" title="RF Circuit Design Lab">
+    <img src="../images/icon.png" alt="" width="30" height="30">
+    <span><b>Smith Chart Lab</b><small>RF Circuit Design Lab</small></span>
+  </a>
+  <div class="top-actions">
+    <a class="pill-link wide-only" href="../#install"><i class="ph ph-download-simple"></i> Desktop lab for Windows</a>
+    <button class="icon-btn" id="more" aria-label="Share, print and install" aria-haspopup="menu" aria-expanded="false" title="Share, print, install"><i class="ph ph-dots-three-outline"></i></button>
+    <button class="icon-btn" id="theme" aria-label="Switch light or dark"><i class="ph ph-moon"></i></button>
+    <div class="menu" id="menu" role="menu" hidden>
+      <button role="menuitem" data-menu="share"><i class="ph ph-share-network"></i><span><b>Share a link</b><small>Your chart or a problem, in one link</small></span></button>
+      <button role="menuitem" data-menu="print"><i class="ph ph-printer"></i><span><b>Print or save as PDF</b><small>Your work, or a blank worksheet</small></span></button>
+      <button role="menuitem" data-menu="install" hidden><i class="ph ph-device-mobile"></i><span><b>Install the app</b><small>Works offline, from your home screen</small></span></button>
+      <a role="menuitem" href="../#install"><i class="ph ph-download-simple"></i><span><b>Desktop lab for Windows</b><small>Nine labs, a Circuit Studio and 50 experiments</small></span></a>
+      <p class="menu-foot" id="offline-state"></p>
+    </div>
+  </div>
+</header>
+
+<main class="workspace">
+  <div class="toolbar" aria-label="Tools">
+    <nav class="tools" id="tools">
+      <button class="tool" data-tool="select" aria-pressed="true" title="Read (V)"><i class="ph ph-cursor"></i><span>Read</span></button>
+      <button class="tool" data-tool="load" aria-pressed="false" title="Load (L)"><i class="ph ph-map-pin"></i><span>Load</span></button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="tool" data-tool="series" aria-pressed="false" title="Series (S)"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12h5.5M17 12h5.5"/><rect x="7" y="8.5" width="10" height="7" rx="1.6"/></svg><span>Series</span></button>
+      <button class="tool" data-tool="shunt" aria-pressed="false" title="Shunt (P)"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 5h21M12 5v3.5M12 16.5V19M8 21.5h8"/><rect x="8.5" y="8.5" width="7" height="8" rx="1.6"/></svg><span>Shunt</span></button>
+      <button class="tool" data-tool="line" aria-pressed="false" title="Line (T)"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 9h21M1.5 15h21"/><path d="M5 9v6M19 9v6" class="faint"/></svg><span>Line</span></button>
+      <button class="tool" data-tool="stub" aria-pressed="false" title="Stub (B)"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 5h21M10 5v15M14 5v15M10 20h4"/></svg><span>Stub</span></button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="tool" data-tool="compass" aria-pressed="false" title="Compass (C)"><i class="ph ph-compass-tool"></i><span>Compass</span></button>
+      <button class="tool" data-tool="ruler" aria-pressed="false" title="Ruler (R)"><i class="ph ph-ruler"></i><span>Ruler</span></button>
+      <button class="tool" data-tool="mark" aria-pressed="false" title="Mark (M)"><i class="ph ph-x"></i><span>Mark</span></button>
+      <button class="tool" data-tool="reflect" aria-pressed="false" title="Reflect (Y)"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M5.5 18.5l13-13" stroke-dasharray="2.2 2.2"/><circle cx="18.5" cy="5.5" r="2" class="fill"/><circle cx="5.5" cy="18.5" r="2.2"/></svg><span>Reflect</span></button>
+      <button class="tool" data-tool="erase" aria-pressed="false" title="Erase (E)"><i class="ph ph-eraser"></i><span>Erase</span></button>
+    </nav>
+    <div class="history">
+      <button class="icon-btn" id="undo" aria-label="Undo" title="Undo (Ctrl+Z)" disabled><i class="ph ph-arrow-u-up-left"></i></button>
+      <button class="icon-btn" id="redo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled><i class="ph ph-arrow-u-up-right"></i></button>
+      <button class="icon-btn clear-all" id="clear-all" aria-label="Clear all" title="Clear all: erase everything you drew"><i class="ph ph-broom"></i><span>Clear</span></button>
+    </div>
+  </div>
+
+  <section class="sheet" id="sheet" aria-label="Smith chart">
+    <div class="chart-host" id="chart"></div>
+
+    <div class="float grid-switch" role="radiogroup" aria-label="Grid">
+      <button role="radio" data-grid="z" aria-checked="true" title="Impedance grid (G)">Z</button>
+      <button role="radio" data-grid="y" aria-checked="false" title="Admittance grid (G)">Y</button>
+      <button role="radio" data-grid="zy" aria-checked="false" title="Both grids (G)">Z+Y</button>
+      <span class="thumb" aria-hidden="true"></span>
+    </div>
+
+    <div class="float zoom" aria-label="Zoom">
+      <button class="icon-btn" id="zoom-in" aria-label="Zoom in" title="Zoom in (+)"><i class="ph ph-plus"></i></button>
+      <button class="icon-btn" id="zoom-out" aria-label="Zoom out" title="Zoom out (−)"><i class="ph ph-minus"></i></button>
+      <button class="icon-btn" id="fit" aria-label="Fit the chart" title="Fit (F)"><i class="ph ph-corners-in"></i></button>
+    </div>
+
+    <div class="float opts" id="opts" hidden>
+      <label>Z<sub>c</sub><span class="input small"><input id="opt-zc" inputmode="decimal" value="50"><em>Ω</em></span></label>
+      <div class="seg" role="radiogroup" aria-label="Stub end" id="opt-end">
+        <button role="radio" data-end="open" aria-checked="true">open</button>
+        <button role="radio" data-end="short" aria-checked="false">short</button>
+      </div>
+    </div>
+
+    <p class="float hint" id="hint" aria-live="polite"></p>
+
+    <section class="player coach" id="coach" hidden aria-live="polite" aria-label="Lesson">
+      <header>
+        <span class="player-kicker"><i class="ph ph-graduation-cap"></i> <span id="coach-name"></span></span>
+        <span class="coach-count" id="coach-count"></span>
+        <button class="icon-btn small" id="coach-min" aria-label="Fold the lesson card" title="Fold"><i class="ph ph-caret-down"></i></button>
+        <button class="icon-btn small" id="coach-close" aria-label="Leave the lesson" title="Leave the lesson"><i class="ph ph-x"></i></button>
+      </header>
+      <div class="coach-body">
+        <p class="coach-text" id="coach-text"></p>
+        <form class="coach-answer" id="coach-answer" autocomplete="off" hidden>
+          <span class="input"><input id="coach-input" inputmode="decimal" aria-label="Your answer"><em id="coach-unit"></em></span>
+          <button class="primary small" type="submit"><i class="ph ph-check"></i> Check</button>
+        </form>
+        <p class="coach-feedback" id="coach-feedback" hidden></p>
+        <p class="coach-hint" id="coach-hint" hidden></p>
+      </div>
+      <footer>
+        <div class="dots" id="coach-dots"></div>
+        <button class="ghost-btn small" id="coach-hint-btn"><i class="ph ph-lightbulb"></i> Hint</button>
+        <button class="ghost-btn small" id="coach-watch"><i class="ph ph-play"></i> Show me</button>
+        <button class="primary small" id="coach-tool" hidden></button>
+        <button class="primary small" id="coach-start" hidden>Start <i class="ph ph-caret-right"></i></button>
+        <button class="primary small" id="coach-next" hidden>Next lesson <i class="ph ph-caret-right"></i></button>
+      </footer>
+    </section>
+
+    <section class="player" id="player" hidden aria-live="polite" aria-label="Worked solution">
+      <header>
+        <span class="player-kicker"><i class="ph ph-graduation-cap"></i> <span id="player-name"></span></span>
+        <button class="icon-btn small" id="player-close" aria-label="Close the worked solution" title="Close (Esc)"><i class="ph ph-x"></i></button>
+      </header>
+      <h3 id="player-title"></h3>
+      <p id="player-text"></p>
+      <p class="formula" id="player-formula" hidden></p>
+      <footer>
+        <div class="dots" id="player-dots"></div>
+        <button class="ghost-btn" id="player-back" aria-label="Previous step"><i class="ph ph-caret-left"></i></button>
+        <button class="ghost-btn" id="player-replay" aria-label="Replay this step" title="Replay"><i class="ph ph-arrow-clockwise"></i></button>
+        <button class="primary small" id="player-next">Next <i class="ph ph-caret-right"></i></button>
+        <button class="primary small" id="player-use" hidden><i class="ph ph-plus-circle"></i> Add to my network</button>
+      </footer>
+    </section>
+  </section>
+
+  <aside class="panel" id="panel" aria-label="Setup, network and readings">
+    <div class="handle" id="handle" aria-hidden="true"><span></span></div>
+
+    <div class="peek" id="peek"></div>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="read" aria-selected="true">Readings</button>
+      <button role="tab" data-tab="network" aria-selected="false">Network<b class="count" id="net-count"></b></button>
+      <button role="tab" data-tab="setup" aria-selected="false">Load &amp; Z₀</button>
+      <button role="tab" data-tab="lessons" aria-selected="false">Lessons<b class="count" id="lesson-count"></b></button>
+    </div>
+
+    <div class="panel-scroll">
+      <section class="card tab-page" data-page="setup">
+        <h2><i class="ph ph-sliders-horizontal"></i> Load &amp; reference</h2>
+        <form class="fields" id="setup" autocomplete="off">
+          <label>Reference Z₀<span class="input"><input id="z0" inputmode="decimal" value="50"><em>Ω</em></span></label>
+          <label>Design f₀<span class="input"><input id="f0" inputmode="decimal" value="1"><em>GHz</em></span></label>
+          <div class="mode-row">
+            <span>Enter the load as</span>
+            <div class="seg" role="radiogroup" aria-label="Enter the load as" id="load-mode">
+              <button type="button" role="radio" data-mode="z" aria-checked="true">Z</button>
+              <button type="button" role="radio" data-mode="g" aria-checked="false">Γ</button>
+              <button type="button" role="radio" data-mode="y" aria-checked="false">Y</button>
+            </div>
+          </div>
+          <label><span id="la-name">Load R</span><span class="input"><input id="lr" inputmode="decimal" value="25"><em id="la-unit">Ω</em></span></label>
+          <label><span id="lb-name">Load X</span><span class="input"><input id="lx" inputmode="decimal" value="-40"><em id="lb-unit">Ω</em></span></label>
+          <button class="primary" type="submit"><i class="ph ph-pencil-simple-line"></i> Plot the load</button>
+          <p class="field-error" id="setup-error" role="alert"></p>
+        </form>
+        <div class="presets" aria-label="Example loads">
+          <span>Try</span>
+          <button data-preset="25,-40">25 − j40</button>
+          <button data-preset="100,50">100 + j50</button>
+          <button data-preset="10,0">10 Ω</button>
+          <button data-preset="0,30">j30</button>
+          <button data-preset="open">Open</button>
+          <button data-preset="0,0">Short</button>
+          <button data-preset="match">Matched</button>
+        </div>
+      </section>
+
+      <section class="tab-page" data-page="network">
+        <div class="card network-card">
+          <h2><i class="ph ph-circuitry"></i> Matching network</h2>
+          <div id="ladder"></div>
+          <ol class="moves" id="moves"></ol>
+          <div class="net-status" id="net-status"></div>
+          <div class="net-actions">
+            <button class="ghost-btn" id="remove-last"><i class="ph ph-backspace"></i> Remove last</button>
+            <button class="ghost-btn" id="clear-net"><i class="ph ph-trash"></i> Clear network</button>
+          </div>
+        </div>
+        <div class="card solve-card">
+          <h2><i class="ph ph-magic-wand"></i> Solutions</h2>
+          <p class="solve-from" id="solve-from"></p>
+          <div class="seg families" role="tablist" id="families">
+            <button role="tab" data-family="lnet" aria-checked="true">L-network</button>
+            <button role="tab" data-family="stub" aria-checked="false">Stub</button>
+            <button role="tab" data-family="qwt" aria-checked="false">λ/4</button>
+          </div>
+          <ul class="solutions" id="solutions"></ul>
+        </div>
+        <div class="card how-card">
+          <h2><i class="ph ph-lightbulb"></i> How the moves work</h2>
+          <ul class="how-list">
+            <li><b>Series</b> keeps r fixed: the point slides on its resistance circle. Clockwise adds an inductor, anticlockwise a capacitor.</li>
+            <li><b>Shunt</b> keeps g fixed: the point slides on its conductance circle. Clockwise adds a capacitor, anticlockwise an inductor.</li>
+            <li><b>Line</b> turns the point clockwise around the centre at constant |Γ|. Half a wavelength is one full turn.</li>
+            <li><b>Stub</b> is a shunt element made of line: it slides on the conductance circle too. Choose open or short and its Z<sub>c</sub> under the chart.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="tab-page" data-page="lessons">
+        <div class="card lessons-card">
+          <h2><i class="ph ph-graduation-cap"></i> Guided lessons</h2>
+          <p class="lessons-note">Seven exercises from the desktop lab. Each step is checked as you work: plot, draw and read the chart, then type what you read. Use <b>Show me</b> on any step to watch it done first.</p>
+          <ol class="lessons" id="lessons"></ol>
+          <p class="lessons-foot"><span id="lessons-done"></span><button class="link-btn" id="lessons-reset" hidden>Reset progress</button></p>
+        </div>
+      </section>
+
+      <section class="tab-page active" data-page="read">
+        <div class="card explain" id="explain" hidden></div>
+        <div class="card readings-card">
+          <p class="masked-note" id="masked-note" hidden><i class="ph ph-eye-slash"></i> Values are hidden while the lesson asks you to read one off the chart. Tap a reading to see where it is read.</p>
+          <div class="focus-row" id="focus"></div>
+          <ul class="readings" id="readings"></ul>
+        </div>
+        <p class="legend"><span class="sw deg"></span>∠Γ in degrees <span class="sw wtg"></span>λ toward generator <span class="sw wtl"></span>λ toward load <small>Rings, inside out</small></p>
+      </section>
+
+      <footer class="credit">
+        <p>Made by <b>Dr Hichem Boubakar</b> for students of RF and microwave design.
+        The full <a href="../">RF Circuit Design Lab</a> for Windows adds matching moves, guided exercises, eight more labs and a Circuit Studio.</p>
+      </footer>
+    </div>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<dialog class="confirm" id="confirm-clear" aria-labelledby="confirm-title">
+  <form method="dialog">
+    <div class="confirm-icon"><i class="ph ph-broom"></i></div>
+    <h2 id="confirm-title">Clear the chart?</h2>
+    <p>This erases the network, compass circles, ruler lines, marks, reflections and the probe. The load and Z₀ stay. You can undo it.</p>
+    <div class="confirm-actions">
+      <button class="ghost-btn" value="cancel">Keep my work</button>
+      <button class="primary danger" value="clear" id="confirm-yes"><i class="ph ph-broom"></i> Clear all</button>
+    </div>
+  </form>
+</dialog>
+<dialog class="confirm share" id="share-dlg" aria-labelledby="share-title">
+  <form method="dialog">
+    <div class="confirm-icon"><i class="ph ph-share-network"></i></div>
+    <h2 id="share-title">Share a link</h2>
+    <div class="seg share-kind" role="radiogroup" aria-label="What to share" id="share-kind">
+      <button type="button" role="radio" data-kind="all" aria-checked="true">My chart</button>
+      <button type="button" role="radio" data-kind="problem" aria-checked="false">Problem only</button>
+    </div>
+    <p id="share-note"></p>
+    <input class="share-link" id="share-link" readonly aria-label="Link">
+    <div class="confirm-actions">
+      <button class="ghost-btn" value="close">Close</button>
+      <button class="primary" type="button" id="share-go"><i class="ph ph-copy"></i> Copy link</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="confirm" id="print-dlg" aria-labelledby="print-title">
+  <form method="dialog">
+    <div class="confirm-icon"><i class="ph ph-printer"></i></div>
+    <h2 id="print-title">Print or save as PDF</h2>
+    <p>Pick <b>Save as PDF</b> as the printer to get a file.</p>
+    <div class="print-choices">
+      <button class="choice" value="work"><i class="ph ph-chart-polar"></i><b>My work</b><small>The chart as drawn, with the readings and the network</small></button>
+      <button class="choice" value="blank"><i class="ph ph-note-blank"></i><b>Blank worksheet</b><small>The problem and an empty chart, with lines for the answers</small></button>
+    </div>
+    <div class="confirm-actions one"><button class="ghost-btn" value="cancel">Cancel</button></div>
+  </form>
+</dialog>
+
+<section class="print-sheet" id="print-sheet" aria-hidden="true"></section>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

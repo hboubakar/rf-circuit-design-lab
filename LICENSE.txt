@@ -16,8 +16,8 @@ agree to these terms. If you do not agree, do not install or use it.
    Without the author's written permission you may not:
    a) copy or redistribute the Software or its installer, including by uploading it to another
       website, file-sharing service or app store. The only official source is the download page,
-      https://hichemboubakar.github.io/rf-circuit-design-lab/ , and its GitHub releases at
-      https://github.com/hichemboubakar/rf-circuit-design-lab/releases . Anyone may download it
+      https://hboubakar.github.io/rf-circuit-design-lab/ , and its GitHub releases at
+      https://github.com/hboubakar/rf-circuit-design-lab/releases . Anyone may download it
       from there; you may share links to that page;
    b) sell, rent, lend or sublicense the Software, or use it to provide a paid service;
    c) modify, translate, adapt or create derivative works of the Software or its content;
@@ -51,5 +51,5 @@ agree to these terms. If you do not agree, do not install or use it.
 
 8. Permissions and feedback
    For permission beyond these terms, or to report a problem, open an issue at
-   https://github.com/hichemboubakar/rf-circuit-design-lab/issues or contact the author through
+   https://github.com/hboubakar/rf-circuit-design-lab/issues or contact the author through
    your course instructor.
