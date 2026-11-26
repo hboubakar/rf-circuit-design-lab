@@ -95,6 +95,10 @@ export class SmithChart {
     this.loupe.className = 'loupe';
     this.loupe.innerHTML = `<svg class="smith loupe-svg"><g class="loupe-paper"></g><g class="loupe-dyn"></g><g class="loupe-cross"><line/><line/></g></svg>`;
     this.host.appendChild(this.loupe);
+    // Under the magnifier: the coordinates of the point it shows (the finger hides the chart).
+    this.loupeRead = document.createElement('div');
+    this.loupeRead.className = 'loupe-read';
+    this.host.appendChild(this.loupeRead);
     this.setGrid(this.grid, true);
   }
 
@@ -627,7 +631,7 @@ export class SmithChart {
     this.showSnap(name ? g : null, name, e);
     if (d.which === 'load' || d.which === 'probe') this.on.preview(d.which, g);
     else this.drawGhost(d.which, g);
-    if (e.pointerType !== 'mouse') this.showLoupe(sx, sy, g);
+    if (e.pointerType !== 'mouse') { this.loupeText = null; this.loupeSnap = name; this.showLoupe(sx, sy, g); }
   }
 
   trackMove(e, sx, sy) {
@@ -718,6 +722,7 @@ export class SmithChart {
 
   caption(html, sx, sy, touch) {
     const t = this.tip;
+    if (touch) { this.loupeText = html; t.classList.remove('on', 'caption'); return; }
     t.innerHTML = html;
     t.classList.add('on', 'caption');
     const tw = t.offsetWidth || 160, th = t.offsetHeight || 40;
@@ -818,13 +823,42 @@ export class SmithChart {
     l2.setAttribute('y1', y - arm); l2.setAttribute('y2', y + arm); l2.setAttribute('x1', x); l2.setAttribute('x2', x);
     svg.style.setProperty('--cross', 1.4 / ppu);
     // Sit above the finger, or below it near the top edge.
-    let ly = sy - size - 46;
+    // (Above: high enough that the readout under it clears the fingertip.)
+    let ly = sy - size - 96;
     if (ly < 4) ly = sy + 46;
     const lx = Math.max(4, Math.min(this.size.w - size - 4, sx - size / 2));
     this.loupe.style.transform = `translate(${lx}px, ${ly}px)`;
     this.loupe.classList.add('on');
+    this.showLoupeRead(g, lx + size / 2, ly + size + 10);
   }
-  hideLoupe() { this.loupe.classList.remove('on'); }
+  /** The readout under the magnifier: a tool's caption, or the coordinates of the point. */
+  showLoupeRead(g, cx, top) {
+    const box = this.loupeRead;
+    let html = this.loupeText;
+    if (!html) {
+      const snap = this.loupeSnap ? `<span class="snap">${this.loupeSnap}</span>` : '';
+      if (this.quiet || g.abs() > 1 + 1e-9) html = snap;
+      else {
+        const r = read(g);
+        const y = this.grid !== 'z' ? `<br>y = ${cplx(admittance(g), 2)}` : '';
+        html = `${snap}<b>z = ${cplx(to_z(g), 2)}</b>${y}<br>Γ = ${num(r.magnitude, 3)} ∠ ${r.angle === null ? '—' : num(r.angle, 1) + '°'}`;
+      }
+    }
+    if (!html) { box.classList.remove('on'); return; }
+    box.innerHTML = html;
+    const w = box.offsetWidth || 150, h = box.offsetHeight || 44;
+    const x = Math.max(4, Math.min(this.size.w - w - 4, cx - w / 2));
+    // Below the magnifier, or above it when there is no room.
+    const y = top + h + 4 > this.size.h ? top - 132 - 20 - h : top;
+    box.style.transform = `translate(${x}px, ${y}px)`;
+    box.classList.add('on');
+  }
+  hideLoupe() {
+    this.loupe.classList.remove('on');
+    this.loupeRead.classList.remove('on');
+    this.loupeText = null;
+    this.loupeSnap = null;
+  }
 
   // ---- worked solutions ---------------------------------------------------------
   /** Play one step of a worked solution; the moving point follows the move being explained. */

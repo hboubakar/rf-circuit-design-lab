@@ -15,7 +15,8 @@ const store = {
   get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } },
 };
-const phone = matchMedia('(max-width: 899px)');
+// The bottom sheet: phones held upright (held sideways, the panel docks on the right).
+const phone = matchMedia('(max-width: 899px) and (orientation: portrait), (max-width: 899px) and (min-height: 521px)');
 const fine = matchMedia('(pointer: fine)');
 
 // ---- state -------------------------------------------------------------------
@@ -952,41 +953,90 @@ function setSheet(name) {
   panel.style.transform = '';
 }
 setSheet('peek');
+// Drag the sheet up or down from anywhere: the handle, the readings strip, the tabs, or the
+// content (up while it is not fully open, down once its list is scrolled to the top).
+// A tap still works: tap the handle to open or close, tap a chip or a tab to use it.
 (() => {
-  let drag = null;
-  const start = e => {
-    if (!phone.matches || e.target.closest('button:not(.handle), input')) return;
+  const SLOP = 6;
+  let drag = null, suppressUntil = 0;
+  const begin = (y, source) => {
     const offsets = sheetOffsets();
-    drag = { y0: e.clientY, base: offsets[sheet.state], offsets, t: performance.now(), last: e.clientY, v: 0, moved: false };
-    panel.classList.add('dragging');
-    e.currentTarget.setPointerCapture(e.pointerId);
+    drag = { y0: y, base: offsets[sheet.state], offsets, t: performance.now(), last: y, v: 0, moved: false, source };
   };
-  const move = e => {
+  const follow = y => {
     if (!drag) return;
-    const dy = e.clientY - drag.y0;
-    if (Math.abs(dy) > 3) drag.moved = true;
+    const dy = y - drag.y0;
+    if (!drag.moved) {
+      if (Math.abs(dy) < SLOP) return;
+      drag.moved = true;
+      panel.classList.add('dragging');
+    }
     const now = performance.now();
-    drag.v = (e.clientY - drag.last) / Math.max(1, now - drag.t);
-    drag.last = e.clientY; drag.t = now;
-    const y = Math.max(0, Math.min(drag.offsets.peek, drag.base + dy));
-    panel.style.transform = `translateY(${y}px)`;
+    drag.v = (y - drag.last) / Math.max(1, now - drag.t);
+    drag.last = y; drag.t = now;
+    const top = Math.max(0, Math.min(drag.offsets.peek, drag.base + dy));
+    panel.style.transform = `translateY(${top}px)`;
   };
-  const end = e => {
+  const finish = y => {
     if (!drag) return;
-    panel.classList.remove('dragging');
-    const { offsets } = drag;
-    if (!drag.moved) { setSheet(sheet.state === 'peek' ? 'half' : 'peek'); drag = null; return; }
-    const y = Math.max(0, Math.min(offsets.peek, drag.base + e.clientY - drag.y0)) + drag.v * 180;
-    const best = Object.entries(offsets).sort((a, b) => Math.abs(a[1] - y) - Math.abs(b[1] - y))[0][0];
-    setSheet(best);
+    const d = drag;
     drag = null;
+    panel.classList.remove('dragging');
+    if (!d.moved) {
+      if (d.source === 'handle') setSheet(sheet.state === 'peek' ? 'half' : 'peek');
+      return;
+    }
+    suppressUntil = performance.now() + 450; // the drag ended on a button: don't also press it
+    const at = Math.max(0, Math.min(d.offsets.peek, d.base + y - d.y0)) + d.v * 180;
+    const best = Object.entries(d.offsets).sort((a, b) => Math.abs(a[1] - at) - Math.abs(b[1] - at))[0][0];
+    setSheet(best);
   };
-  for (const zone of [$('#handle'), $('.tabs')]) {
-    zone.addEventListener('pointerdown', start);
-    zone.addEventListener('pointermove', move);
-    zone.addEventListener('pointerup', end);
-    zone.addEventListener('pointercancel', end);
+  panel.addEventListener('click', e => {
+    if (performance.now() < suppressUntil) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
+  // The top of the sheet: handle, readings strip and tabs (pointer events, so a mouse works too).
+  for (const zone of [$('#handle'), $('#peek'), $('.tabs')]) {
+    zone.addEventListener('pointerdown', e => {
+      if (!phone.matches || e.button > 0) return;
+      begin(e.clientY, zone.id === 'handle' ? 'handle' : 'head');
+      drag.pointer = e.pointerId;
+    });
+    zone.addEventListener('pointermove', e => {
+      if (!drag || drag.pointer !== e.pointerId) return;
+      const wasMoved = drag.moved;
+      follow(e.clientY);
+      if (drag?.moved && !wasMoved) { try { zone.setPointerCapture(e.pointerId); } catch { /* gone */ } }
+    });
+    zone.addEventListener('pointerup', e => { if (drag?.pointer === e.pointerId) finish(e.clientY); });
+    zone.addEventListener('pointercancel', e => { if (drag?.pointer === e.pointerId) finish(drag.last); });
   }
+
+  // The content: touch events, so the sheet can take over from scrolling.
+  const scroller = $('.panel-scroll');
+  let t = null;
+  scroller.addEventListener('touchstart', e => {
+    if (!phone.matches || e.touches.length !== 1) { t = null; return; }
+    t = { y: e.touches[0].clientY, mode: null };
+  }, { passive: true });
+  scroller.addEventListener('touchmove', e => {
+    if (!t) return;
+    const y = e.touches[0].clientY, dy = y - t.y;
+    if (!t.mode) {
+      if (Math.abs(dy) < SLOP) return;
+      const pullUp = dy < 0 && sheet.state !== 'full';
+      const pullDown = dy > 0 && scroller.scrollTop <= 0;
+      t.mode = pullUp || pullDown ? 'sheet' : 'scroll';
+      if (t.mode === 'sheet') begin(t.y, 'content');
+    }
+    if (t.mode === 'sheet') { e.preventDefault(); follow(y); }
+  }, { passive: false });
+  const done = e => {
+    if (t?.mode === 'sheet') finish(e.changedTouches[0]?.clientY ?? drag?.last ?? 0);
+    t = null;
+  };
+  scroller.addEventListener('touchend', done);
+  scroller.addEventListener('touchcancel', done);
 })();
 phone.addEventListener('change', () => { setSheet('peek'); hint(); });
 
@@ -1014,7 +1064,7 @@ menu.addEventListener('click', e => {
   const b = e.target.closest('[data-menu]');
   if (!b) return;
   openMenu(false);
-  ({ share: openShare, print: () => $('#print-dlg').showModal() })[b.dataset.menu]();
+  ({ share: openShare, print: () => $('#print-dlg').showModal(), about: () => $('#about-dlg').showModal() })[b.dataset.menu]();
 });
 
 // Share: the chart (or just the problem) travels in the link itself.
@@ -1068,6 +1118,7 @@ function openShared() {
 window.addEventListener('hashchange', openShared);
 
 // Print: the browser's print dialog also saves a PDF.
+$('#about-link').addEventListener('click', () => $('#about-dlg').showModal());
 $('#print-dlg').addEventListener('close', () => {
   const v = $('#print-dlg').returnValue;
   if (v === 'work' || v === 'blank') printSheet(v === 'work');

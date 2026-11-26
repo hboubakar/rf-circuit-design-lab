@@ -34,6 +34,7 @@
     <div class="menu" id="menu" role="menu" hidden>
       <button role="menuitem" data-menu="share"><i class="ph ph-share-network"></i><span><b>Share a link</b><small>Your chart or a problem, in one link</small></span></button>
       <button role="menuitem" data-menu="print"><i class="ph ph-printer"></i><span><b>Print or save as PDF</b><small>Your work, or a blank worksheet</small></span></button>
+      <button role="menuitem" data-menu="about"><i class="ph ph-info"></i><span><b>About and credits</b><small>Who made it, and what it uses</small></span></button>
       <a role="menuitem" href="../#install"><i class="ph ph-download-simple"></i><span><b>Desktop lab for Windows</b><small>Nine labs, a Circuit Studio and 50 experiments</small></span></a>
     </div>
   </div>
@@ -228,8 +229,10 @@
       </section>
 
       <footer class="credit">
-        <p>Made by <b>Dr Hichem Boubakar</b> for students of RF and microwave design.
-        The full <a href="../">RF Circuit Design Lab</a> for Windows adds matching moves, guided exercises, eight more labs and a Circuit Studio.</p>
+        <img src="icons/icon-192.png" alt="" width="40" height="40">
+        <p><b>Smith Chart Lab</b> · made by <b>Dr Hichem Boubakar</b> for students of RF and microwave design.
+        The full <a href="../">RF Circuit Design Lab</a> for Windows adds eight more labs, a Circuit Studio and 50 guided experiments.
+        <button class="link-btn" id="about-link" type="button">About and credits</button></p>
       </footer>
     </div>
   </aside>
@@ -275,6 +278,26 @@
       <button class="choice" value="blank"><i class="ph ph-note-blank"></i><b>Blank worksheet</b><small>The problem and an empty chart, with lines for the answers</small></button>
     </div>
     <div class="confirm-actions one"><button class="ghost-btn" value="cancel">Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog class="confirm about" id="about-dlg" aria-labelledby="about-title">
+  <form method="dialog">
+    <img class="about-icon" src="icons/icon-192.png" alt="" width="64" height="64">
+    <h2 id="about-title">Smith Chart Lab</h2>
+    <p class="about-by">Made by <b>Dr Hichem Boubakar</b></p>
+    <p>A free Smith chart that works like paper, for students and teachers of RF and microwave design. It is the web companion of <a href="../">RF Circuit Design Lab</a>, the desktop lab for Windows, and gives the same answers: its maths is checked against the desktop app's engine.</p>
+    <dl class="about-credits">
+      <dt>Design and code</dt><dd>Dr Hichem Boubakar</dd>
+      <dt>Icons</dt><dd><a href="https://phosphoricons.com" target="_blank" rel="noopener">Phosphor Icons</a>, MIT licence</dd>
+      <dt>Fonts</dt><dd>Inter, JetBrains Mono and Caveat, SIL Open Font Licence, from Google Fonts</dd>
+      <dt>Your data</dt><dd>Your work stays in this browser and is never uploaded. Fonts and icons load from Google Fonts and unpkg.</dd>
+    </dl>
+    <p class="about-legal">© 2026 Dr Hichem Boubakar. Free for learning and teaching. <a href="https://github.com/hboubakar/rf-circuit-design-lab/blob/main/LICENSE.txt" target="_blank" rel="noopener">Licence</a></p>
+    <div class="confirm-actions">
+      <a class="ghost-btn" href="../#install"><i class="ph ph-download-simple"></i> Desktop lab</a>
+      <button class="primary" value="close">Close</button>
+    </div>
   </form>
 </dialog>
 
