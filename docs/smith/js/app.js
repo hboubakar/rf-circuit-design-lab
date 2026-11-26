@@ -999,14 +999,13 @@ function toast(text) {
   toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
 }
 
-// ---- menu: share, print, install ---------------------------------------------------------
+// ---- menu: share and print ---------------------------------------------------------------
 const menu = $('#menu'), moreBtn = $('#more');
 function openMenu(open) {
   menu.hidden = !open;
   moreBtn.setAttribute('aria-expanded', String(open));
   if (!open) return;
   menu.classList.remove('enter'); void menu.offsetWidth; menu.classList.add('enter');
-  renderOfflineState();
   menu.querySelector('[role=menuitem]:not([hidden])')?.focus({ preventScroll: true });
 }
 moreBtn.addEventListener('click', e => { e.stopPropagation(); openMenu(menu.hidden); });
@@ -1015,7 +1014,7 @@ menu.addEventListener('click', e => {
   const b = e.target.closest('[data-menu]');
   if (!b) return;
   openMenu(false);
-  ({ share: openShare, print: () => $('#print-dlg').showModal(), install: installApp })[b.dataset.menu]();
+  ({ share: openShare, print: () => $('#print-dlg').showModal() })[b.dataset.menu]();
 });
 
 // Share: the chart (or just the problem) travels in the link itself.
@@ -1126,30 +1125,13 @@ function printSheet(work) {
 }
 window.smithSheet = buildSheet; // to check the sheet on screen
 
-// Install as an app, and work offline (needs https, or localhost).
-let installEvent = null;
-const installItem = $('[data-menu="install"]');
-const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-if (ios && !standalone) installItem.hidden = false;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvent = e; installItem.hidden = false; });
-window.addEventListener('appinstalled', () => { installEvent = null; installItem.hidden = true; toast('<b>Installed.</b> Open Smith Chart Lab from your home screen, even offline.'); });
-async function installApp() {
-  if (installEvent) {
-    installEvent.prompt();
-    await installEvent.userChoice;
-    installEvent = null;
-    installItem.hidden = true;
-    return;
-  }
-  toast('On iPhone or iPad: tap <b>Share</b>, then <b>Add to Home Screen</b>.');
+// The page runs in the browser only, for now. Remove any offline copy that an
+// earlier version saved on this device (sw.js now only unregisters itself).
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(() => {});
 }
-if ('serviceWorker' in navigator && isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
-function renderOfflineState() {
-  const p = $('#offline-state');
-  if (!('serviceWorker' in navigator) || !isSecureContext) p.innerHTML = '<i class="ph ph-wifi-slash"></i> Offline use starts once the page is on its https site.';
-  else if (navigator.serviceWorker.controller) p.innerHTML = '<i class="ph ph-check-circle"></i> Saved on this device: works offline.';
-  else p.innerHTML = '<i class="ph ph-cloud-arrow-down"></i> Saving for offline use…';
+if ('caches' in window) {
+  caches.keys().then(keys => keys.filter(k => k.startsWith('smith-')).forEach(k => caches.delete(k))).catch(() => {});
 }
 
 // ---- start ------------------------------------------------------------------------------
